@@ -19,7 +19,7 @@ To get this application working locally
     vagrant up
 
 Example output
--------------
+=============
 
 $ vagrant up
 The following plugins were installed with a version of Vagrant
