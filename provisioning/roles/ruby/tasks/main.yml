@@ -1,0 +1,15 @@
+- name: install RVM
+  shell: creates=/usr/local/rvm/bin/rvm curl -L https://get.rvm.io | bash -s -- --ignore-dotfiles
+  tags: [ruby]
+
+- name: install Ruby 2.1
+  shell: creates=/usr/local/rvm/rubies/ruby-2.1.0/bin/ruby /usr/local/rvm/bin/rvm install --default ruby-2.1.0
+  tags: [ruby]
+
+- name: install passenger
+  shell: creates=/usr/local/rvm/gems/ruby-2.1.0@global/bin/passenger executable=/bin/bash source /etc/profile.d/rvm.sh && gem install passenger --no-rdoc --no-ri
+  tags: [ruby]
+
+- name: install curl-devel
+  yum: name=curl-devel state=installed
+  tags: [ruby]

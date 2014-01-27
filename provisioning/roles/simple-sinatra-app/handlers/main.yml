@@ -1,0 +1,5 @@
+- name: restart nginx
+  action: service name=nginx state=restarted
+
+- name: restart app
+  command:  touch {{ app_dir }}/tmp/restart.txt

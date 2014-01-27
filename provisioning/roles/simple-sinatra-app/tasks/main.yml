@@ -1,0 +1,28 @@
+- name: setup ngnix virtual host 
+  template: src=vhost.j2 dest=/opt/nginx/conf/sites-available/{{ app_name }} mode=755
+  notify: restart nginx
+  tags: [app]
+
+- name: enable virtual host
+  file: path=/opt/nginx/conf/sites-enabled/{{ app_name }} src=/opt/nginx/conf/sites-available/{{ app_name }} state=link
+  notify: restart nginx
+  tags: [app]
+
+- name: create the application directories
+  file: path={{ item }} owner=deploy group=deploy state=directory
+  with_items:
+    - "{{ app_dir }}"
+  tags: [app]
+
+- name: Check out the latest revision of the code
+  git: repo=https://github.com/tnh/simple-sinatra-app dest={{ app_dir }}
+  sudo: yes
+  sudo_user: deploy
+  tags: [app]
+
+- name: install the app
+  shell: chdir={{ app_dir }} executable=/bin/bash source /etc/profile.d/rvm.sh && bundle install --path {{ app_dir }}/vendor/bundle
+  sudo: yes
+  sudo_user: deploy
+  notify: restart nginx
+  tags: [app]

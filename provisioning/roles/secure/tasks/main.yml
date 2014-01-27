@@ -1,0 +1,20 @@
+- name: install libselinux-python needed for ansible and selinux
+  yum: name=libselinux-python state=installed
+  tags: [secure]
+
+- name: enable selinux
+  selinux: policy=targeted state=enforcing
+  tags: [secure]
+
+- name: write iptables
+  template: src=iptables dest=/etc/sysconfig/iptables
+  notify: restart iptables
+  tags: [secure]
+
+- name: chkconfig
+  shell: chkconfig iptables on
+  tags: [secure]
+
+- name: service start
+  action: service name=iptables state=started enabled=yes
+  tags: [secure]

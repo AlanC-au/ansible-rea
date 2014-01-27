@@ -1,0 +1,9 @@
+- hosts: all
+  sudo: yes
+  tasks:
+  roles:
+    - secure
+    - ruby
+    - nginx
+    - deploy-user
+    - simple-sinatra-app

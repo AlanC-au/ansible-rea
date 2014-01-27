@@ -1,0 +1,42 @@
+- name: create source directory
+  file: dest=/usr/local/src owner=root group=root mode=755 state=directory 
+  tags: [nginx]
+
+- name: download source
+  get_url: url=http://nginx.org/download/nginx-{{ nginx_version }}.tar.gz dest=/usr/local/src/nginx-{{ nginx_version }}.tar.gz
+  tags: [nginx]
+
+- name: untar 
+  command: creates=/usr/local/src/nginx-{{ nginx_version }} tar -C /usr/local/src -xzvf /usr/local/src/nginx-{{ nginx_version }}.tar.gz
+  tags: [nginx]
+
+- name: install passenger-nginx
+  shell: creates={{ nginx_dir }}/nginx executable=/bin/bash source /etc/profile.d/rvm.sh && passenger-install-nginx-module --auto --prefix=/opt/nginx --nginx-source-dir=/usr/local/src/nginx-1.5.9  --extra-configure-flags=none
+  tags: [nginx]
+
+- name: write nginx.conf 
+  template: src=nginx-conf.j2 dest={{ nginx_dir }}/conf/nginx.conf
+  notify: restart nginx
+  tags: [nginx]
+
+- name: setup init file
+  template: src=nginx-init.j2 dest=/etc/rc.d/init.d/nginx owner=root group=root mode=0755
+  notify: restart nginx
+  tags: [nginx]
+
+- name: setup vhost directories
+  file: path={{ nginx_dir }}/conf/{{ item }}
+        state=directory
+  with_items:
+    - sites-available
+    - sites-enabled
+  tags: [nginx]
+
+- name: chkconfig
+  shell: chkconfig --add nginx
+  shell: chkconfig nginx on
+  tags: [nginx]
+
+- name: service start 
+  action: service name=nginx state=started enabled=yes
+  tags: [nginx]

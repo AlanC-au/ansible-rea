@@ -1,0 +1,29 @@
+user  nobody;
+worker_processes  4;  
+
+events {
+    worker_connections  1024;
+}
+
+
+http {
+    passenger_root /usr/local/rvm/gems/ruby-2.1.0@global/gems/passenger-4.0.36;
+    passenger_ruby /usr/local/rvm/gems/ruby-2.1.0@global/wrappers/ruby;
+
+    passenger_max_pool_size 2;
+
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    sendfile       on;
+    tcp_nopush     on;
+    client_max_body_size  10M;
+
+    keepalive_timeout  10;
+
+    gzip  on;
+    gzip_types  text/css text/xml text/plain application/x-javascript application/atom+xml application/rss+xml;
+
+
+    include /opt/nginx/conf/sites-enabled/*;
+}
